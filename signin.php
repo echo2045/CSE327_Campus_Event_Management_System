@@ -32,20 +32,20 @@ if (isset($_POST['email'], $_POST['password'])) {
                 // Redirect to different pages based on role
                 switch ($role) {
                     case 'admin':
-                        header("Location: admin_dashboard.php");
+                        header("Location: landingpage.php");
                         break;
                     case 'organizer':
-                        header("Location: organizer_dashboard.php");
+                        header("Location: landingpage.php");
                         break;
                     case 'students':
-                        header("Location: event.php");
+                        header("Location: landingpage.php");
                         break;
                         case 'faculty':
-                            header("Location: event.php");
+                            header("Location: landingpage.php");
                             break;
                     default:
                         // Default redirection if no matching role is found
-                        header("Location: default_dashboard.php");
+                        header("Location: landingpage.php");
                         break;
                 }
                 exit; // Make sure to exit after redirection
