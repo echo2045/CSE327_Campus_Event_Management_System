@@ -207,19 +207,7 @@
             </form>
         </section>
 
-        <!-- Approve Events Form -->
-        <section class="approve-events">
-            <h3>Approve Pending Events</h3>
-            <form action="approve_event.php" method="post">
-                <div class="form-group">
-                    <label for="event_id">Event ID:</label>
-                    <input type="text" id="event_id" name="event_id" required>
-                </div>
-                <div class="form-group">
-                    <input type="submit" name="approve_event" value="Approve Event">
-                </div>
-            </form>
-        </section>
+       
          <!-- Approve Events Form -->
         <section class="approve-events">
             <h3>Approve Pending Events</h3>
@@ -298,7 +286,6 @@
                     <th>Title</th>
                     <th>Description</th>
                     <th>Date/Time</th>
-                    <th>Organizer</th>
                 </tr>
                 <?php
                 // Database connection parameters (reuse existing $servername, $username, $password, $dbname)
@@ -325,7 +312,6 @@
                         echo '<td>' . htmlspecialchars($row['title']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['description']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['date_time']) . '</td>';
-                        echo '<td>' . htmlspecialchars($row['organizer_id']) . '</td>';
                         echo '</tr>';
                     }
                 } else {

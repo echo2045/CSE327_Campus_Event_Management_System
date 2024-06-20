@@ -25,6 +25,7 @@ $stmt->bind_param("sss", $title, $description, $date_time);
 // Execute SQL statement
 if ($stmt->execute()) {
     echo "Event submitted for approval successfully.";
+    echo '<br><br><a href="javascript:history.go(-1)" class="back-button">Back</a>'; // Back button
 } else {
     echo "Error submitting event: " . $conn->error;
 }

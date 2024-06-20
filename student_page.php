@@ -15,23 +15,7 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
-
-// Query to get student information (assuming 'users' table contains student information)
-$query_student_info = "SELECT * FROM users WHERE id = ?";
-$stmt_student_info = $conn->prepare($query_student_info);
-$stmt_student_info->bind_param("i", $student_id);
-$stmt_student_info->execute();
-$result_student_info = $stmt_student_info->get_result();
-
-if ($result_student_info->num_rows > 0) {
-    $student = $result_student_info->fetch_assoc();
-} else {
-    die("Student not found.");
-}
-
-$stmt_student_info->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -52,6 +36,7 @@ $stmt_student_info->close();
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            position: relative; /* Ensure the container is relative for absolute positioning of logout button */
         }
         h2 {
             text-align: center;
@@ -64,9 +49,6 @@ $stmt_student_info->close();
             padding: 10px;
             border-radius: 5px;
             margin-bottom: 10px;
-        }
-        .feedback-form {
-            margin-top: 20px;
         }
         .form-group {
             margin-bottom: 10px;
@@ -86,7 +68,7 @@ $stmt_student_info->close();
             background-color: #007bff;
             border: none;
             border-radius: 5px;
-            color: #fff;    
+            color: #fff;
             font-size: 16px;
             cursor: pointer;
         }
@@ -96,41 +78,33 @@ $stmt_student_info->close();
         .registered-events {
             margin-top: 20px;
         }
-        .user-info {
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: #f0f0f0;
-            border-radius: 5px;
-        }
+        /* Logout button styles */
         .logout-btn {
-            text-align: right;
+            position: absolute;
+            top: 10px;
+            right: 10px;
         }
         .logout-btn button {
             padding: 8px 16px;
-            background-color: #dc3545;
+            background-color: #ff4444;
             border: none;
+            border-radius: 5px;
             color: white;
             font-size: 14px;
             cursor: pointer;
-            border-radius: 5px;
         }
         .logout-btn button:hover {
-            background-color: #c82333;
+            background-color: #cc0000;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="user-info">
-            <h3>Welcome, <?php echo htmlspecialchars($student['full_name']); ?></h3>
-            <p><strong>Email:</strong> <?php echo htmlspecialchars($student['email']); ?></p>
-            <!-- Add more user information as needed -->
-        </div>
-
         <div class="logout-btn">
-            <button onclick="location.href='logout.php';">Logout</button>
+            <form action="logout.php" method="post">
+                <button type="submit">Logout</button>
+            </form>
         </div>
-
         <h2>Welcome to Student Page</h2>
 
         <!-- Display upcoming events -->
@@ -164,29 +138,33 @@ $stmt_student_info->close();
             ?>
         </div>
 
-        <!-- Feedback Form -->
-        <div class="feedback-form">
-            <h3>Submit Feedback</h3>
-            <form action="submit_feedback.php" method="post">
-                <input type="hidden" name="user_id" value="<?php echo $student_id; ?>">
-                <div>
-                    <label for="event_id">Event ID:</label>
-                    <input type="text" id="event_id" name="event_id" required>
-                </div>
-                <div>
-                    <label for="feedback">Feedback:</label>
-                    <textarea id="feedback" name="feedback" rows="4" required></textarea>
-                </div>
-                <div>
-                    <input type="submit" value="Submit Feedback">
-                </div>
-            </form>
-        </div>
+        <!-- Submit Feedback Section -->
+        <h2>Submit Feedback</h2>
+        <form action="submit_feedback.php" method="post">
+            <input type="hidden" name="user_id" value="<?php echo $student_id; ?>"> <!-- Use PHP to insert actual student ID -->
+            <div>
+                <label for="event_id">Event ID:</label>
+                <input type="text" id="event_id" name="event_id" required>
+            </div>
+            <div>
+                <label for="feedback">Feedback:</label>
+                <textarea id="feedback" name="feedback" rows="4" required></textarea>
+            </div>
+            <div>
+                <input type="submit" value="Submit Feedback">
+            </div>
+        </form>
 
         <!-- Display registered events -->
         <div class="registered-events">
-            <h3>Registered Events</h3>
+            <h3></h3>
             <?php
+            // Reconnect to database for registered events section
+            $conn = new mysqli($servername, $username, $password, $dbname);
+            if ($conn->connect_error) {
+                die("Connection failed: " . $conn->connect_error);
+            }
+
             // Query registered events for the student
             $query_registered_events = "SELECT events.title, events.date_time, events.description
                                         FROM events
@@ -207,11 +185,12 @@ $stmt_student_info->close();
                     echo '</div>';
                 }
             } else {
-                echo '<p>No registered events.</p>';
+                echo '<p></p>';
             }
 
             // Close statement and connection
             $stmt_registered_events->close();
+            $conn->close();
             ?>
         </div>
     </div>

@@ -1,6 +1,3 @@
-
-
-
 <?php
 // Database connection parameters
 $servername = "localhost";
@@ -35,6 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($stmt->execute()) {
                 // Feedback submitted successfully
                 echo "Feedback submitted successfully.";
+                echo '<br><br><a href="javascript:history.go(-1)" class="back-button">Back</a>'; // Back button
             } else {
                 // Error executing statement
                 echo "Error submitting feedback: " . $stmt->error;
