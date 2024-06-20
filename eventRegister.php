@@ -1,3 +1,5 @@
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -75,6 +77,8 @@
     </style>
 </head>
 <body>
+
+</body>
     <div class="navbar">
         <a href="landingpage.php">Home</a>
         <a href="event.html">Events</a>
@@ -86,7 +90,7 @@
     </div>
 
     <div class="container">
-        <form action="submit_eventregister.php" method="post">
+        <form action="eventRegister.php" method="post">
             <div class="form-group">
                 <label for="event">Event:</label>
                 <select id="event" name="event" required>
@@ -123,3 +127,43 @@
     </div>
 </body>
 </html>
+
+<?php
+// Database connection
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db = "campus_event_management_system";
+$conn = new mysqli($host, $user, $pass, $db);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+// Check if the form is submitted
+if(isset($_POST['event'], $_POST['name'], $_POST['email'], $_POST['role'])){
+    // Retrieve form data
+    $eventName = $_POST['event'];
+    $name = $_POST['name'];
+    $email = $_POST['email'];
+    $role = $_POST['role'];
+
+    // Prepare SQL statement for insertion
+    $sql = "INSERT INTO eventRegister (eventName, name, email, role) VALUES (?, ?, ?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ssss", $eventName, $name, $email, $role);
+
+    // Execute SQL statement
+    if ($stmt->execute()) {
+        echo "Registration successful!";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+
+    // Close prepared statement
+    $stmt->close();
+}
+
+// Close database connection
+$conn->close();
+?>
+

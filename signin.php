@@ -1,3 +1,68 @@
+<?php
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db = "campus_event_management_system";
+
+$conn = new mysqli($host, $user, $pass, $db);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+if (isset($_POST['email'], $_POST['password'])) {
+    $email = $_POST['email'];
+    $password = $_POST['password'];
+
+    // Check if the user exists in any of the role tables
+    $roles = ['admin', 'organizer', 'students','faculty'];
+    $loggedIn = false;
+
+    foreach ($roles as $role) {
+        $sql = "SELECT * FROM $role WHERE email = ?";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows == 1) {
+            $row = $result->fetch_assoc();
+            if (password_verify($password, $row['password'])) {
+                echo "Login successful as $role!";
+                $loggedIn = true;
+                // Redirect to different pages based on role
+                switch ($role) {
+                    case 'admin':
+                        header("Location: admin_dashboard.php");
+                        break;
+                    case 'organizer':
+                        header("Location: organizer_dashboard.php");
+                        break;
+                    case 'students':
+                        header("Location: event.php");
+                        break;
+                        case 'faculty':
+                            header("Location: event.php");
+                            break;
+                    default:
+                        // Default redirection if no matching role is found
+                        header("Location: default_dashboard.php");
+                        break;
+                }
+                exit; // Make sure to exit after redirection
+            }
+        }
+    }
+
+
+    $stmt->close();
+}
+
+$conn->close();
+?>
+
+
+
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -38,7 +103,7 @@
             background-color: #007bff;
             border: none;
             border-radius: 5px;
-            color: #fff;
+            color: #fff;    
             font-size: 16px;
             cursor: pointer;
         }
@@ -50,7 +115,7 @@
 <body>
     <div class="container">
         <h2>Signin Form</h2>
-        <form action="submit_signin.php" method="post">
+        <form action="signin.php" method="post">
             <div class="form-group">
                 <label for="email">North South Mail Address:</label>
                 <input type="email" id="email" name="email" required>

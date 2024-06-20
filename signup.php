@@ -1,5 +1,55 @@
+<?php
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db = "campus_event_management_system";
+
+$conn = new mysqli($host, $user, $pass, $db);
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+
+if (isset($_POST['email'], $_POST['password'], $_POST['role'])) {
+    $email = $_POST['email'];
+    $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+    $role = $_POST['role'];
+
+    switch ($role) {
+        case 'Admin':
+            $table = 'admin';
+            break;
+        case 'Organizer':
+            $table = 'organizer';
+            break;
+        case 'Faculty':
+            $table = 'faculty';
+            break;
+        case 'Student':
+            $table = 'students';
+            break;
+        default:
+            echo "Invalid role";
+            exit;
+    }
+
+    $sql = "INSERT INTO $table (email, password) VALUES (?, ?)";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("ss", $email, $password);
+
+    if ($stmt->execute()) {
+        echo "Registration successful!";
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+
+    $stmt->close();
+}
+
+$conn->close();
+?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -52,19 +102,53 @@
         .form-group input[type="submit"]:hover {
             background-color: #218838;
         }
+        .error {
+            color: red;
+            font-size: 14px;
+        }
     </style>
 </head>
 <body>
+    <script>
+        function validateForm() {
+            var email = document.getElementById("email");
+            var password = document.getElementById("password");
+            var emailError = document.getElementById("email-error");
+            var passwordError = document.getElementById("password-error");
+
+            emailError.textContent = "";
+            passwordError.textContent = "";
+
+            // Email validation with regular expression
+            var emailRegex = /^[^\s@]+@northsouth\.edu$/;
+            if (!emailRegex.test(email.value)) {
+                emailError.textContent = "Email must be in format username@northsouth.edu";
+                console.log("invalid email");
+                return false; // Prevent form submission if email is invalid
+            }
+
+            // Password length check
+            if (password.value.length < 5 || password.value.length > 11) {
+                passwordError.textContent = "Password must be 5-11 characters long";
+                console.log("invalid password");
+                return false; // Prevent form submission if password length is invalid
+            }
+
+            return true; // Allow form submission if all validations pass
+        }
+    </script>
     <div class="container">
         <h2>Signup Form</h2>
-        <form action="submit_signup.php" method="post">
+        <form action="signin.php" method="post" onsubmit="return validateForm()">
             <div class="form-group">
                 <label for="email">North South Mail Address:</label>
                 <input type="email" id="email" name="email" required>
+                <div id="email-error" class="error"></div>
             </div>
             <div class="form-group">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required>
+                <div id="password-error" class="error"></div>
             </div>
             <div class="form-group">
                 <label>Role:</label>
@@ -90,3 +174,5 @@
     </div>
 </body>
 </html>
+
+
