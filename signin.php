@@ -1,65 +1,59 @@
 <?php
-$host = "localhost";
-$user = "root";
-$pass = "";
-$db = "campus_event_management_system";
+// Database connection parameters
+$servername = "localhost";
+$username = 'root'; // Replace with your MySQL username
+$password = ''; // Replace with your MySQL password
+$dbname = "327"; // Replace with your database name
 
-$conn = new mysqli($host, $user, $pass, $db);
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-if (isset($_POST['email'], $_POST['password'])) {
+// Process form data after submission
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Retrieve form data
     $email = $_POST['email'];
     $password = $_POST['password'];
 
-    // Check if the user exists in any of the role tables
-    $roles = ['admin', 'organizer', 'students','faculty'];
-    $loggedIn = false;
+    // Validate user credentials based on email and password
+    // Example query assuming you have a table named 'users' with 'type' column to differentiate between admin, student, faculty, organizer
+    $sql = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
+    $result = $conn->query($sql);
 
-    foreach ($roles as $role) {
-        $sql = "SELECT * FROM $role WHERE email = ?";
-        $stmt = $conn->prepare($sql);
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
+    if ($result->num_rows > 0) {
+        // User found, determine user type
+        $user = $result->fetch_assoc();
+        $userType = $user['type'];
 
-        if ($result->num_rows == 1) {
-            $row = $result->fetch_assoc();
-            if (password_verify($password, $row['password'])) {
-                echo "Login successful as $role!";
-                $loggedIn = true;
-                // Redirect to different pages based on role
-                switch ($role) {
-                    case 'admin':
-                        header("Location: landingpage.php");
-                        break;
-                    case 'organizer':
-                        header("Location: landingpage.php");
-                        break;
-                    case 'students':
-                        header("Location: landingpage.php");
-                        break;
-                        case 'faculty':
-                            header("Location: landingpage.php");
-                            break;
-                    default:
-                        // Default redirection if no matching role is found
-                        header("Location: landingpage.php");
-                        break;
-                }
-                exit; // Make sure to exit after redirection
-            }
+        // Redirect to corresponding page based on user type
+        switch ($userType) {
+            case 'admin':
+                header("Location: admin_page.php");
+                break;
+            case 'student':
+                header("Location: student_page.php");
+                break;
+            case 'faculty':
+                header("Location: faculty_page.php");
+                break;
+            case 'organizer':
+                header("Location: organizer_page.php");
+                break;
+            default:
+                echo "Unknown user type";
         }
+    } else {
+        echo "Invalid email or password";
     }
-
-
-    $stmt->close();
 }
 
+// Close connection
 $conn->close();
 ?>
-
 
 
 
