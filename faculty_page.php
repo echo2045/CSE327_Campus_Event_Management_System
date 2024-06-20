@@ -1,3 +1,21 @@
+<?php
+// Ensure you have the faculty ID from somewhere, e.g., from a login process or another form of authentication
+$faculty_id = 1; // Replace with the actual faculty ID, or retrieve it from your application's logic
+
+// Database connection parameters
+$servername = "localhost";
+$username = 'root'; // Replace with your MySQL username
+$password = ''; // Replace with your MySQL password
+$dbname = "327"; // Replace with your database name
+
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -73,28 +91,15 @@
             <h3>Upcoming Events</h3>
             
             <?php
-            // Database connection parameters
-            $servername = "localhost";
-            $username = 'root'; // Replace with your MySQL username
-            $password = ''; // Replace with your MySQL password
-            $dbname = "327"; // Replace with your database name
-
-            // Create connection
-            $conn = new mysqli($servername, $username, $password, $dbname);
-
-            // Check connection
-            if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
-            }
-
             // Query upcoming events
-            $query_events = "SELECT * FROM events WHERE date_time > NOW() ORDER BY date_time";
+            $query_events = "SELECT id, title, date_time, description FROM events WHERE date_time > NOW() ORDER BY date_time";
             $result_events = $conn->query($query_events);
 
             if ($result_events->num_rows > 0) {
                 while ($row = $result_events->fetch_assoc()) {
                     echo '<div class="event-item">';
                     echo '<h4>' . htmlspecialchars($row['title']) . '</h4>';
+                    echo '<p><strong>Event ID:</strong> ' . htmlspecialchars($row['id']) . '</p>'; // Display Event ID
                     echo '<p><strong>Date:</strong> ' . htmlspecialchars($row['date_time']) . '</p>';
                     echo '<p><strong>Description:</strong><br>' . htmlspecialchars($row['description']) . '</p>';
                     echo '<form action="register_event.php" method="post">';
@@ -134,22 +139,14 @@
         <div class="registered-events">
             <h3>Registered Events</h3>
             <?php
-            // Database connection (assuming you already have this part)
-            $conn = new mysqli($servername, $username, $password, $dbname);
-
-            // Check connection
-            if ($conn->connect_error) {
-                die("Connection failed: " . $conn->connect_error);
-            }
-
             // Query registered events for the faculty
             $query_registered_events = "SELECT events.title, events.date_time, events.description
                                         FROM events
                                         INNER JOIN event_registrations ON events.id = event_registrations.event_id
-                                        WHERE event_registrations.user_id = ? AND event_registrations.user_type = 'faculty'
+                                        WHERE event_registrations.user_id = users.id AND event_registrations.user_type = 'faculty'
                                         ORDER BY events.date_time";
             $stmt_registered_events = $conn->prepare($query_registered_events);
-            $stmt_registered_events->bind_param("i", $_SESSION['faculty_id']); // Replace with your actual session variable
+            $stmt_registered_events->bind_param("i", $faculty_id); // Bind faculty_id
             $stmt_registered_events->execute();
             $result_registered_events = $stmt_registered_events->get_result();
 
@@ -167,7 +164,6 @@
 
             // Close statement and connection
             $stmt_registered_events->close();
-            $conn->close();
             ?>
         </div>
     </div>

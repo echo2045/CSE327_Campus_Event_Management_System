@@ -1,23 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register for Event</title>
+</head>
+<body>
+    <form action="register_event.php" method="post">
+        <label for="event_id">Event ID:</label>
+        <input type="text" id="event_id" name="event_id" required><br><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <input type="submit" value="Register">
+    </form>
+</body>
+</html>
+
 <?php
-session_start();
-
-// Debug: Display all session variables
-echo "<pre>";
-print_r($_SESSION);
-echo "</pre>";
-?>
-
-
-<?php
-
 // Check if the form is submitted
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Validate inputs
     $event_id = $_POST['event_id'];
+    $email = $_POST['email']; // Adjust based on your form input names
 
-    // Validate if event_id is provided
-    if (empty($event_id)) {
-        die("Error: Event ID is required.");
+    // Validate if event_id and email are provided
+    if (empty($event_id) || empty($email)) {
+        die("Error: Event ID and Email are required.");
     }
 
     // Database connection parameters
@@ -34,25 +44,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         die("Connection failed: " . $conn->connect_error);
     }
 
-    // Start session to get student_id or faculty_id
-    session_start();
-    $user_id = $_SESSION['student_id']; // Replace with your actual session variable for students
-    // Or
-    $user_id = $_SESSION['faculty_id']; // Replace with your actual session variable for faculty
+    // Check if the user exists as a student or faculty
+    $query_check_user = "SELECT id, type FROM users WHERE email = ?";
+    $stmt_check_user = $conn->prepare($query_check_user);
+    $stmt_check_user->bind_param("s", $email);
+    $stmt_check_user->execute();
+    $result_check_user = $stmt_check_user->get_result();
 
-    // Check if the user is a student or faculty
-    if (isset($_SESSION['student_id'])) {
-        $dtype = 'student';
-    } elseif (isset($_SESSION['faculty_id'])) {
-        $dtype = 'faculty';
-    } else {
-        die("Error: User session not found.");
+    if ($result_check_user->num_rows === 0) {
+        die("Error: User with provided email not found.");
+    }
+
+    // Fetch user information
+    $user_row = $result_check_user->fetch_assoc();
+    $user_id = $user_row['id'];
+    $user_type = $user_row['type'];
+
+    // Validate if the user type is allowed to register for events
+    if ($user_type !== 'student' && $user_type !== 'faculty') {
+        die("Error: Only students and faculty can register for events.");
     }
 
     // Check if the user is already registered for the event
-    $query_check_registration = "SELECT * FROM event_registrations WHERE event_id = ? AND user_id = ? AND dtype = ?";
+    $query_check_registration = "SELECT * FROM event_registrations WHERE event_id = ? AND user_id = ?";
     $stmt_check_registration = $conn->prepare($query_check_registration);
-    $stmt_check_registration->bind_param("iis", $event_id, $user_id, $dtype);
+    $stmt_check_registration->bind_param("ii", $event_id, $user_id);
     $stmt_check_registration->execute();
     $result_check_registration = $stmt_check_registration->get_result();
 
@@ -61,9 +77,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Insert registration into the database
-    $query_register_event = "INSERT INTO event_registrations (event_id, user_id, dtype) VALUES (?, ?, ?)";
+    $query_register_event = "INSERT INTO event_registrations (event_id, user_id, user_type) VALUES (?, ?, ?)";
     $stmt_register_event = $conn->prepare($query_register_event);
-    $stmt_register_event->bind_param("iis", $event_id, $user_id, $dtype);
+    $stmt_register_event->bind_param("iis", $event_id, $user_id, $user_type);
 
     if ($stmt_register_event->execute()) {
         echo "Registration successful. You will receive a notification.";
@@ -73,6 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // Close statements and connection
+    $stmt_check_user->close();
     $stmt_check_registration->close();
     $stmt_register_event->close();
     $conn->close();

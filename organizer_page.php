@@ -106,7 +106,6 @@
             }
 
             // Query upcoming events
-            
             $query_events = "SELECT * FROM events WHERE date_time > NOW() ORDER BY date_time";
             $result_events = $conn->query($query_events);
 
@@ -116,10 +115,11 @@
                     echo '<h4>' . htmlspecialchars($row['title']) . '</h4>';
                     echo '<p><strong>Date:</strong> ' . htmlspecialchars($row['date_time']) . '</p>';
                     echo '<p><strong>Description:</strong><br>' . htmlspecialchars($row['description']) . '</p>';
-                    echo '<form action="approve_registration.php" method="post">';
-                    echo '<input type="hidden" name="event_id" value="' . $row['id'] . '">';
-                    echo '<input type="submit" value="Approve Registrations">';
-                    echo '</form>';
+                    if ($row['approved'] == 0) {
+                        echo '<p><strong>Status:</strong> Pending Approval</p>';
+                    } else {
+                        echo '<p><strong>Status:</strong> Approved</p>';
+                    }
                     echo '</div>';
                 }
             } else {
@@ -135,7 +135,7 @@
         <div class="registration-list">
             <h3>Registrations Awaiting Approval</h3>
             <?php
-            // Database connection (assuming you already have this part)
+            // Database connection
             $conn = new mysqli($servername, $username, $password, $dbname);
 
             // Check connection
@@ -177,7 +177,7 @@
         <div class="feedback-list">
             <h3>Feedback Received</h3>
             <?php
-            // Database connection (assuming you already have this part)
+            // Database connection
             $conn = new mysqli($servername, $username, $password, $dbname);
 
             // Check connection
@@ -211,26 +211,28 @@
         </div>
 
         <!-- Create Event Form -->
-        <div class="create-event-form">
-            <h3>Create New Event</h3>
-            <form action="create_event.php" method="post">
-                <div class="form-group">
-                    <label for="title">Title:</label>
-                    <input type="text" id="title" name="title" required>
-                </div>
-                <div class="form-group">
-                    <label for="description">Description:</label>
-                    <textarea id="description" name="description" rows="4" required></textarea>
-                </div>
-                <div class="form-group">
-                    <label for="date_time">Date and Time:</label>
-                    <input type="datetime-local" id="date_time" name="date_time" required>
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Create Event">
-                </div>
-            </form>
+<div class="create-event-form">
+    <h3>Create New Event</h3>
+    <form action="submit_event.php" method="post">
+        <div class="form-group">
+            <label for="title">Title:</label>
+            <input type="text" id="title" name="title" required>
         </div>
-    </div>
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" rows="4" required></textarea>
+        </div>
+        <div class="form-group">
+            <label for="date_time">Date and Time:</label>
+            <input type="datetime-local" id="date_time" name="date_time" required>
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Submit for Approval">
+        </div>
+    </form>
+</div>
+</div>
 </body>
 </html>
+
+

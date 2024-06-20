@@ -16,19 +16,28 @@ if ($conn->connect_error) {
 // Handle add user action
 if (isset($_POST['add_user'])) {
     $email = $_POST['email'];
+    $name = $_POST['name'];
+    $password = $_POST['password']; // Admin-set password
+    $type = $_POST['type'];
 
     // Check if the user already exists
-    $check_query = "SELECT * FROM users WHERE email = '$email'";
-    $check_result = $conn->query($check_query);
+    $check_query = "SELECT * FROM users WHERE email = ?";
+    $stmt_check = $conn->prepare($check_query);
+    $stmt_check->bind_param("s", $email);
+    $stmt_check->execute();
+    $check_result = $stmt_check->get_result();
 
     if ($check_result->num_rows > 0) {
         header("Location: admin_page.php?message=User already exists&status=error");
         exit();
     }
 
-    // Insert the user into the users table
-    $insert_query = "INSERT INTO users (email, type) VALUES ('$email', 'student')"; // Default type 'student', adjust as needed
-    if ($conn->query($insert_query) === TRUE) {
+    // Insert the user into the users table (without password hashing)
+    $insert_query = "INSERT INTO users (email, name, password, type) VALUES (?, ?, ?, ?)";
+    $stmt_insert = $conn->prepare($insert_query);
+    $stmt_insert->bind_param("ssss", $email, $name, $password, $type);
+
+    if ($stmt_insert->execute()) {
         header("Location: admin_page.php?message=User added successfully&status=success");
         exit();
     } else {
@@ -37,13 +46,17 @@ if (isset($_POST['add_user'])) {
     }
 }
 
+
 // Handle delete user action
 if (isset($_POST['delete_user'])) {
     $email = $_POST['email'];
 
     // Delete the user from the users table
-    $delete_query = "DELETE FROM users WHERE email = '$email'";
-    if ($conn->query($delete_query) === TRUE) {
+    $delete_query = "DELETE FROM users WHERE email = ?";
+    $stmt_delete = $conn->prepare($delete_query);
+    $stmt_delete->bind_param("s", $email);
+
+    if ($stmt_delete->execute()) {
         header("Location: admin_page.php?message=User deleted successfully&status=success");
         exit();
     } else {
@@ -55,12 +68,3 @@ if (isset($_POST['delete_user'])) {
 // Close connection
 $conn->close();
 ?>
-
-
-
-
-
-
-
-
-

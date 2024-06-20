@@ -191,30 +191,15 @@
             </form>
         </section>
 
-        <!-- Approve Events Form -->
-        <section class="approve-events">
-            <h3>Approve Pending Events</h3>
-            <form action="approve_event.php" method="post">
-                <div class="form-group">
-                    <label for="event_id">Event ID:</label>
-                    <input type="text" id="event_id" name="event_id" required>
-                </div>
-                <div class="form-group">
-                    <input type="submit" name="approve_event" value="Approve Event">
-                </div>
-            </form>
-        </section>
-
-        <!-- Pending Events List -->
-        <section class="pending-events">
-            <h3>Pending Events</h3>
+        <!-- Approved Events List -->
+        <section class="events-list">
+            <h3>Approved Events</h3>
             <table>
                 <tr>
                     <th>Title</th>
                     <th>Description</th>
                     <th>Date/Time</th>
                     <th>Organizer</th>
-                    <th>Action</th>
                 </tr>
                 <?php
                 // Database connection parameters
@@ -231,70 +216,21 @@
                     die("Connection failed: " . $conn->connect_error);
                 }
 
-                // Query to fetch pending events with organizer details
-                $query_pending = "SELECT e.id, e.title, e.description, e.date_time, u.name AS organizer_name
-                                  FROM events e
-                                  INNER JOIN users u ON e.id = u.id
-                                  WHERE e.approved = 0";
-                $result_pending = $conn->query($query_pending);
+                // Query to fetch approved events with organizer details
+                $query = "SELECT e.title, e.description, e.date_time, o.name AS organizer_name
+                          FROM events e
+                          INNER JOIN organizers o ON e.organizer_id = o.id
+                          WHERE e.approved = 1";
+                $result = $conn->query($query);
 
-                // Display pending events
-                if ($result_pending->num_rows > 0) {
-                    while ($row = $result_pending->fetch_assoc()) {
+                // Display events
+                if ($result->num_rows > 0) {
+                    while ($row = $result->fetch_assoc()) {
                         echo '<tr>';
                         echo '<td>' . htmlspecialchars($row['title']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['description']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['date_time']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['organizer_name']) . '</td>';
-                        echo '<td><a href="admin_actions.php?action=approve&event_id=' . $row['id'] . '">Approve</a></td>';
-                        echo '</tr>';
-                    }
-                } else {
-                    echo '<tr><td colspan="5">No pending events found.</td></tr>';
-                }
-
-                // Close connection
-                $conn->close();
-                ?>
-            </table>
-        </section>
-
-        <!-- Approved Events List -->
-        <section class="events-list">
-            <h3>Approved Events</h3>
-            <table>
-                <tr>
-                    <th>Title</th>
-                    <th>Description</th>
-                    <th>Date/Time</th>
-                    <th>Organizer</th>
-                </tr>
-                <?php
-                // Database connection parameters (reuse existing $servername, $username, $password, $dbname)
-
-                // Create connection
-                $conn = new mysqli($servername, $username, $password, $dbname);
-
-                // Check connection
-                if ($conn->connect_error) {
-                    die("Connection failed: " . $conn->connect_error);
-                }
-
-                // Query to fetch approved events with organizer details
-                $query_approved = "SELECT e.title, e.description, e.date_time, u.name AS organizer_name
-                                   FROM events e
-                                   INNER JOIN users u ON e.id = u.id
-                                   WHERE e.approved = 1";
-                $result_approved = $conn->query($query_approved);
-
-                // Display events
-                if ($result_approved->num_rows > 0) {
-                    while ($row = $result_approved->fetch_assoc()) {
-                        echo '<tr>';
-                        echo '<td>' . htmlspecialchars($row['title']) . '</td>';
-                        echo '<td>' . htmlspecialchars($row['description']) . '</td>';
-                        echo '<td>' . htmlspecialchars($row['date_time']) . '</td>';
-                        echo '<td>' . htmlspecialchars($row['organizer_id']) . '</td>';
                         echo '</tr>';
                     }
                 } else {
