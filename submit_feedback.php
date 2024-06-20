@@ -1,48 +1,56 @@
+
+
+
 <?php
-// Check if the form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Validate inputs
-    $event_id = $_POST['event_id'];
-    $feedback = $_POST['feedback'];
+// Database connection parameters
+$servername = "localhost";
+$username = 'root'; // Replace with your MySQL username
+$password = ''; // Replace with your MySQL password
+$dbname = "327"; // Replace with your database name
 
-    // Validate if event_id and feedback are provided
-    if (empty($event_id) || empty($feedback)) {
-        die("Error: Event ID and Feedback are required.");
-    }
+// Create connection
+$conn = new mysqli($servername, $username, $password, $dbname);
 
-    // Database connection parameters
-    $servername = "localhost";
-    $username = 'root'; // Replace with your MySQL username
-    $password = ''; // Replace with your MySQL password
-    $dbname = "327"; // Replace with your database name
-
-    // Create connection
-    $conn = new mysqli($servername, $username, $password, $dbname);
-
-    // Check connection
-    if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-
-    // Start session to get student_id
-    session_start();
-    $student_id = $_SESSION['student_id']; // Replace with your actual session variable
-
-    // Insert feedback into the database
-    $stmt = $conn->prepare("INSERT INTO feedback (event_id, student_id, feedback_text) VALUES (?, ?, ?)");
-    $stmt->bind_param("iis", $event_id, $student_id, $feedback);
-
-    if ($stmt->execute()) {
-        echo "Feedback submitted successfully.";
-    } else {
-        echo "Error: " . $stmt->error;
-    }
-
-    // Close statement and connection
-    $stmt->close();
-    $conn->close();
-} else {
-    // If the form is not submitted, redirect or handle as needed
-    die("Error: Form submission method not allowed.");
+// Check connection
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error);
 }
+
+// Check if the form was submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Validate and sanitize input
+    $user_id = isset($_POST['user_id']) ? intval($_POST['user_id']) : null; // Assuming user_id is passed via form
+    $event_id = isset($_POST['event_id']) ? intval($_POST['event_id']) : null;
+    $feedback = isset($_POST['feedback']) ? htmlspecialchars($_POST['feedback']) : '';
+
+    // Ensure user_id is valid (not null or empty)
+    if ($user_id && $event_id && $feedback !== '') {
+        // Prepare SQL statement for inserting feedback
+        $query = "INSERT INTO student_feedback (user_id, event_id, feedback) VALUES (?, ?, ?)";
+        $stmt = $conn->prepare($query);
+
+        if ($stmt) {
+            // Bind parameters and execute statement
+            $stmt->bind_param("iis", $user_id, $event_id, $feedback);
+            if ($stmt->execute()) {
+                // Feedback submitted successfully
+                echo "Feedback submitted successfully.";
+            } else {
+                // Error executing statement
+                echo "Error submitting feedback: " . $stmt->error;
+            }
+            // Close statement
+            $stmt->close();
+        } else {
+            // Error preparing statement
+            echo "Error preparing statement: " . $conn->error;
+        }
+    } else {
+        // Validation failed
+        echo "Invalid input data.";
+    }
+}
+
+// Close connection
+$conn->close();
 ?>

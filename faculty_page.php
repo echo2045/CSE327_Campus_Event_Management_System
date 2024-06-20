@@ -15,7 +15,23 @@ $conn = new mysqli($servername, $username, $password, $dbname);
 if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
+
+// Query to get faculty information (assuming 'users' table contains faculty information)
+$query_faculty_info = "SELECT * FROM users WHERE id = ?";
+$stmt_faculty_info = $conn->prepare($query_faculty_info);
+$stmt_faculty_info->bind_param("i", $faculty_id);
+$stmt_faculty_info->execute();
+$result_faculty_info = $stmt_faculty_info->get_result();
+
+if ($result_faculty_info->num_rows > 0) {
+    $faculty = $result_faculty_info->fetch_assoc();
+} else {
+    die("Faculty not found.");
+}
+
+$stmt_faculty_info->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -80,10 +96,41 @@ if ($conn->connect_error) {
         .registered-events {
             margin-top: 20px;
         }
+        .user-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 5px;
+        }
+        .logout-btn {
+            text-align: right;
+        }
+        .logout-btn button {
+            padding: 8px 16px;
+            background-color: #dc3545;
+            border: none;
+            color: white;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .logout-btn button:hover {
+            background-color: #c82333;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <div class="user-info">
+            <h3>Welcome, <?php echo htmlspecialchars($faculty['full_name']); ?></h3>
+            <p><strong>Email:</strong> <?php echo htmlspecialchars($faculty['email']); ?></p>
+            <!-- Add more user information as needed -->
+        </div>
+
+        <div class="logout-btn">
+            <button onclick="location.href='logout.php';">Logout</button>
+        </div>
+
         <h2>Welcome to Faculty Page</h2>
 
         <!-- Display upcoming events -->
@@ -121,15 +168,16 @@ if ($conn->connect_error) {
         <div class="feedback-form">
             <h3>Submit Feedback</h3>
             <form action="submit_feedback.php" method="post">
-                <div class="form-group">
+                <input type="hidden" name="user_id" value="<?php echo $faculty_id; ?>">
+                <div>
                     <label for="event_id">Event ID:</label>
                     <input type="text" id="event_id" name="event_id" required>
                 </div>
-                <div class="form-group">
+                <div>
                     <label for="feedback">Feedback:</label>
                     <textarea id="feedback" name="feedback" rows="4" required></textarea>
                 </div>
-                <div class="form-group">
+                <div>
                     <input type="submit" value="Submit Feedback">
                 </div>
             </form>
@@ -143,7 +191,7 @@ if ($conn->connect_error) {
             $query_registered_events = "SELECT events.title, events.date_time, events.description
                                         FROM events
                                         INNER JOIN event_registrations ON events.id = event_registrations.event_id
-                                        WHERE event_registrations.user_id = users.id AND event_registrations.user_type = 'faculty'
+                                        WHERE event_registrations.user_id = ? AND event_registrations.user_type = 'faculty'
                                         ORDER BY events.date_time";
             $stmt_registered_events = $conn->prepare($query_registered_events);
             $stmt_registered_events->bind_param("i", $faculty_id); // Bind faculty_id

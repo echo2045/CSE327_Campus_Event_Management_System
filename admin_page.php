@@ -86,6 +86,22 @@
             justify-content: space-between;
             align-items: center;
         }
+
+        .pending-list {
+            margin-top: 30px;
+        }
+        .pending-list table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .pending-list th, .pending-list td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        .pending-list th {
+            background-color: #f2f2f2;
+        }
         .events-list {
             margin-top: 30px;
         }
@@ -204,17 +220,30 @@
                 </div>
             </form>
         </section>
+         <!-- Approve Events Form -->
+        <section class="approve-events">
+            <h3>Approve Pending Events</h3>
+            <form action="approve_event.php" method="post">
+                <div class="form-group">
+                    <label for="event_id">Event ID:</label>
+                    <input type="text" id="event_id" name="event_id" required>
+                </div>
+                <div class="form-group">
+                    <input type="submit" name="approve_event" value="Approve Event">
+                </div>
+            </form>
+        </section>
 
-        <!-- Pending Events List -->
-        <section class="pending-events">
+        
+        <!-- pending Events List -->
+        <section class="events-list">
             <h3>Pending Events</h3>
             <table>
                 <tr>
                     <th>Title</th>
                     <th>Description</th>
                     <th>Date/Time</th>
-                    <th>Organizer</th>
-                    <th>Action</th>
+                    <th>ID</th>
                 </tr>
                 <?php
                 // Database connection parameters
@@ -231,6 +260,7 @@
                     die("Connection failed: " . $conn->connect_error);
                 }
 
+
                 // Query to fetch pending events with organizer details
                 $query_pending = "SELECT e.id, e.title, e.description, e.date_time, u.name AS organizer_name
                                   FROM events e
@@ -238,19 +268,18 @@
                                   WHERE e.approved = 0";
                 $result_pending = $conn->query($query_pending);
 
-                // Display pending events
+                // Display events
                 if ($result_pending->num_rows > 0) {
                     while ($row = $result_pending->fetch_assoc()) {
                         echo '<tr>';
                         echo '<td>' . htmlspecialchars($row['title']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['description']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['date_time']) . '</td>';
-                        echo '<td>' . htmlspecialchars($row['organizer_name']) . '</td>';
-                        echo '<td><a href="admin_actions.php?action=approve&event_id=' . $row['id'] . '">Approve</a></td>';
+                        echo '<td>' . htmlspecialchars($row['id']) . '</td>';
                         echo '</tr>';
                     }
                 } else {
-                    echo '<tr><td colspan="5">No pending events found.</td></tr>';
+                    echo '<tr><td colspan="4">No pending events found.</td></tr>';
                 }
 
                 // Close connection
@@ -258,6 +287,8 @@
                 ?>
             </table>
         </section>
+
+
 
         <!-- Approved Events List -->
         <section class="events-list">
@@ -306,6 +337,7 @@
                 ?>
             </table>
         </section>
+
 
         <!-- Track Attendees Section -->
         <section class="attendees-list">
