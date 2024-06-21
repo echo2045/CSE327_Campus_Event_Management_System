@@ -221,6 +221,7 @@
         <div class="registration-list">
             <h3> </h3>
             <?php
+            /*
             // Database connection
             $conn = new mysqli($servername, $username, $password, $dbname);
 
@@ -230,13 +231,13 @@
             }
 
             // Query registrations for approval
-            $query_registrations = "SELECT events.title AS event_title, students.name AS student_name
-                                   FROM event_registrations
-                                   INNER JOIN events ON event_registrations.event_id = events.id
-                                   INNER JOIN students ON event_registrations.user_id = students.id
-                                   WHERE events.date_time > NOW() AND event_registrations.approved = 0
-                                   ORDER BY events.date_time";
-            $result_registrations = $conn->query($query_registrations);
+            //$query_registrations = "SELECT events.title AS event_title, students.name AS student_name
+            //                       FROM event_registrations
+            //                       INNER JOIN events ON event_registrations.event_id = events.id
+            //                       INNER JOIN students ON event_registrations.user_id = students.id
+            //                       WHERE events.date_time > NOW() AND event_registrations.approved = 0
+            //                       ORDER BY events.date_time";
+            //$result_registrations = $conn->query($query_registrations);
 
             if ($result_registrations->num_rows > 0) {
                 while ($row = $result_registrations->fetch_assoc()) {
@@ -256,6 +257,7 @@
 
             // Close connection
             $conn->close();
+            */
             ?>
         </div>
 
@@ -285,7 +287,7 @@ $query_faculty_feedback = "SELECT f.event_id, e.title AS event_title, f.feedback
 
 // Execute queries and fetch results
 $result_student_feedback = $conn->query($query_student_feedback);
-$result_faculty_feedback = $conn->query($query_faculty_feedback);
+//$result_faculty_feedback = $conn->query($query_faculty_feedback);
 
 // Function to display feedback
 function displayFeedback($result, $userType) {
@@ -310,7 +312,7 @@ function displayFeedback($result, $userType) {
 displayFeedback($result_student_feedback, 'Student');
 
 // Display feedback for faculty
-displayFeedback($result_faculty_feedback, 'Faculty');
+//displayFeedback($result_faculty_feedback, 'Faculty');
 
 // Close connection
 $conn->close();

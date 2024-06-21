@@ -2,10 +2,10 @@
 -- version 5.2.1
 -- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Jun 20, 2024 at 08:08 PM
--- Server version: 10.4.28-MariaDB
--- PHP Version: 8.0.28
+-- Host: 127.0.0.1
+-- Generation Time: Jun 21, 2024 at 02:33 AM
+-- Server version: 10.4.32-MariaDB
+-- PHP Version: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -20,17 +20,6 @@ SET time_zone = "+00:00";
 --
 -- Database: `327`
 --
-
--- --------------------------------------------------------
-
---
--- Table structure for table `admin`
---
-
-CREATE TABLE `admin` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -61,8 +50,9 @@ INSERT INTO `events` (`id`, `title`, `description`, `date_time`, `status`, `orga
 (4, 'ban vs ind', 't2o worldcup', '2024-06-21 12:19:00', 'pending', NULL, '2024-06-20 08:31:37', '2024-06-20 13:12:11', 1),
 (5, 'asas', 'scarce', '2024-06-22 17:47:00', 'pending', NULL, '2024-06-20 11:47:39', '2024-06-20 11:47:39', 0),
 (6, 'euro', 'ger vs st', '2024-06-21 18:03:00', 'pending', NULL, '2024-06-20 12:03:12', '2024-06-20 13:57:24', 1),
-(7, 'eid ul adha ', 'ahbsvlavx hxhhsvhv zzz has;asv watch and fun together', '2024-06-22 19:56:00', 'pending', NULL, '2024-06-20 13:56:31', '2024-06-20 13:56:31', 0),
-(8, 'RAMISA birthday PARTY', 'at rehans house', '2024-07-02 23:58:00', 'pending', NULL, '2024-06-20 17:58:25', '2024-06-20 17:59:24', 1);
+(7, 'eid ul adha ', 'ahbsvlavx hxhhsvhv zzz has;asv watch and fun together', '2024-06-22 19:56:00', 'pending', NULL, '2024-06-20 13:56:31', '2024-06-21 00:14:40', 1),
+(8, 'RAMISA birthday PARTY', 'at rehans house', '2024-07-02 23:58:00', 'pending', NULL, '2024-06-20 17:58:25', '2024-06-20 17:59:24', 1),
+(9, 'Por vs Csezh', 'ROnaldo!!', '2024-06-18 13:00:00', 'pending', NULL, '2024-06-21 00:27:09', '2024-06-21 00:27:57', 1);
 
 -- --------------------------------------------------------
 
@@ -89,31 +79,9 @@ INSERT INTO `event_registrations` (`id`, `event_id`, `user_id`, `approved`, `cre
 (7, 2, 3, 0, '2024-06-20 11:05:56', '2024-06-20 11:05:56', 'faculty'),
 (8, 5, 2, 0, '2024-06-20 13:16:13', '2024-06-20 13:16:13', 'student'),
 (9, 7, 10, 0, '2024-06-20 14:00:11', '2024-06-20 14:00:11', 'student'),
-(10, 8, 12, 0, '2024-06-20 18:01:28', '2024-06-20 18:01:28', 'student');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `faculty`
---
-
-CREATE TABLE `faculty` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `faculty_feedback`
---
-
-CREATE TABLE `faculty_feedback` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL,
-  `event_id` int(11) NOT NULL,
-  `feedback` text NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+(10, 8, 12, 0, '2024-06-20 18:01:28', '2024-06-20 18:01:28', 'student'),
+(11, 8, 16, 0, '2024-06-21 00:29:20', '2024-06-21 00:29:20', 'faculty'),
+(12, 2, 14, 0, '2024-06-21 00:31:35', '2024-06-21 00:31:35', 'student');
 
 -- --------------------------------------------------------
 
@@ -122,17 +90,6 @@ CREATE TABLE `faculty_feedback` (
 --
 
 CREATE TABLE `organizer` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `students`
---
-
-CREATE TABLE `students` (
   `id` int(11) NOT NULL,
   `user_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -159,7 +116,9 @@ INSERT INTO `student_feedback` (`id`, `user_id`, `event_id`, `feedback`) VALUES
 (2, 1, 7, 'weds'),
 (3, 1, 2, 'sknsmcn'),
 (4, 1, 2, 'asknclja'),
-(5, 1, 8, 'ahaaa ki silo mairi');
+(5, 1, 8, 'ahaaa ki silo mairi'),
+(6, 1, 8, 'great party!'),
+(7, 1, 2, 'I am learning my alphabets');
 
 -- --------------------------------------------------------
 
@@ -192,18 +151,15 @@ INSERT INTO `users` (`id`, `email`, `password`, `type`, `name`, `created_at`, `u
 (8, 'af@northsouth.edu', 'asd', 'organizer', 'ss', '2024-06-20 12:02:14', '2024-06-20 12:02:14'),
 (9, 'g@northsouth.edu', '11234', 'student', 'zxcz', '2024-06-20 12:28:06', '2024-06-20 12:28:06'),
 (10, 'student1@northsouth.edu', '123', 'student', 'ifrit hasin', '2024-06-20 13:58:56', '2024-06-20 13:58:56'),
-(12, 'ruhan@northsouth.edu', 'ramisa', 'student', 'Ruhan ', '2024-06-20 18:00:01', '2024-06-20 18:00:01');
+(12, 'ruhan@northsouth.edu', 'ramisa', 'student', 'Ruhan ', '2024-06-20 18:00:01', '2024-06-20 18:00:01'),
+(13, 'masteradmin@northsouth.edu', '1234', 'admin', 'Syeed Zaman', '2024-06-21 00:06:35', '2024-06-21 00:06:35'),
+(14, 'student2@northsouth.edu', '1234', 'student', 'Nafis Forkan', '2024-06-21 00:08:24', '2024-06-21 00:08:24'),
+(15, 'organizer1@northsouth.edu', '1234', 'organizer', 'Safwan Islam', '2024-06-21 00:09:45', '2024-06-21 00:09:45'),
+(16, 'faculty1@northsouth.edu', '1234', 'faculty', 'Vabna Proma', '2024-06-21 00:11:00', '2024-06-21 00:11:00');
 
 --
 -- Indexes for dumped tables
 --
-
---
--- Indexes for table `admin`
---
-ALTER TABLE `admin`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
 
 --
 -- Indexes for table `events`
@@ -221,31 +177,9 @@ ALTER TABLE `event_registrations`
   ADD KEY `fk_user_id` (`user_id`);
 
 --
--- Indexes for table `faculty`
---
-ALTER TABLE `faculty`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
-
---
--- Indexes for table `faculty_feedback`
---
-ALTER TABLE `faculty_feedback`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`),
-  ADD KEY `event_id` (`event_id`);
-
---
 -- Indexes for table `organizer`
 --
 ALTER TABLE `organizer`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `user_id` (`user_id`);
-
---
--- Indexes for table `students`
---
-ALTER TABLE `students`
   ADD PRIMARY KEY (`id`),
   ADD KEY `user_id` (`user_id`);
 
@@ -269,34 +203,16 @@ ALTER TABLE `users`
 --
 
 --
--- AUTO_INCREMENT for table `admin`
---
-ALTER TABLE `admin`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `events`
 --
 ALTER TABLE `events`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT for table `event_registrations`
 --
 ALTER TABLE `event_registrations`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
-
---
--- AUTO_INCREMENT for table `faculty`
---
-ALTER TABLE `faculty`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
--- AUTO_INCREMENT for table `faculty_feedback`
---
-ALTER TABLE `faculty_feedback`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `organizer`
@@ -305,32 +221,20 @@ ALTER TABLE `organizer`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `students`
---
-ALTER TABLE `students`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `student_feedback`
 --
 ALTER TABLE `student_feedback`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 
 --
 -- Constraints for dumped tables
 --
-
---
--- Constraints for table `admin`
---
-ALTER TABLE `admin`
-  ADD CONSTRAINT `admin_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `events`
@@ -348,29 +252,10 @@ ALTER TABLE `event_registrations`
   ADD CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE;
 
 --
--- Constraints for table `faculty`
---
-ALTER TABLE `faculty`
-  ADD CONSTRAINT `faculty_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `faculty_feedback`
---
-ALTER TABLE `faculty_feedback`
-  ADD CONSTRAINT `faculty_feedback_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`),
-  ADD CONSTRAINT `faculty_feedback_ibfk_2` FOREIGN KEY (`event_id`) REFERENCES `events` (`id`);
-
---
 -- Constraints for table `organizer`
 --
 ALTER TABLE `organizer`
   ADD CONSTRAINT `organizer_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
-
---
--- Constraints for table `students`
---
-ALTER TABLE `students`
-  ADD CONSTRAINT `students_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`);
 
 --
 -- Constraints for table `student_feedback`
